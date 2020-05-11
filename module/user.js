@@ -4,13 +4,13 @@ const User = require('../models/user');
 const Room = require('../models/room');
 const auth = require('../middleware/verifyToken');
 const multer = require('multer');
-
-const storage =multer.diskStorage({
+var fs = require('fs');
+const storage = multer.diskStorage({
     destination:function(req, file, cb){
-        cb(null, 'uploads');
+        cb(null, './public/upload/');
     },
     filename:function(req, file, cb){
-        cb(null, file.originalname);
+        cb(null, 'tmp' + '.jpg');
     }
 });
 
@@ -52,11 +52,12 @@ router.post('/getAllMeeting', auth, async(req, res)=>{
 })
 
 router.post('/avatar', upload.single('avatar'), auth, async(req,res)=>{
-    const findUser = await User.updateOne(
-        {_id : req.user.id},
-        {$set:{avatar : "http://localhost:3000//" + req.file.filename}})
+    var tmpFile = './public/upload/'+ req.file.filename;
+    fs. rename(tmpFile, './public/user/'+ req.body.username+'.jpg', ()=>{
+      return res.send('/public/user/'+ req.body.username+'.jpg');  
+    });
 
-    return res.send('http://localhost:3000//' + req.file.filename);
+    
 })
 
 

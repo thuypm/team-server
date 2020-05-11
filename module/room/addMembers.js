@@ -7,12 +7,15 @@ async function AddMembers(req, res) {
 
 
 // thiếu kiểm tra xem có tồn tại room hay ko ?
-    var  newRoom = await Room.findById(req.body.roomId);
-  if(!newRoom)
-  {
-    res.send(false);
-    return;
-  }
+
+ var  newRoom = await Room.findById(req.body.roomId, (err, data)=>{ ///đoaạn này khó hiểu
+if(err)
+    {
+         res.send(false);
+         return;
+    }
+
+ });
 
 
     await Room.updateOne({_id: req.body.roomId}, {

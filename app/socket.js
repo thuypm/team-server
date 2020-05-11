@@ -21,6 +21,7 @@ io.in(roomId).clients((err, client)=>{
     Id: sk
   })
 }
+// console.log(listFriend);
 io.to(roomId).emit('newUser', listFriend, username, socket.id);
 })
 })
@@ -61,13 +62,38 @@ socket.on('onVideo', (roomId, token)=>{
 	   io.to(roomId).emit('onVideo', token, socket.id);
 })
 socket.on('res_video', (Id, tk)=>{
-  io.to(Id).emit('res_video', socket.id, tk);
+  io.to(Id).emit('res_video', socket.id, tk);// chỉ gửi đến thằng ID 
 })
 
 
-socket.on('send_mess', function(roomId, message){      
-      messModel.saveMess(roomId, message);
+socket.on('send_mess', function(roomId,file, message){
+  if(file)
+  {
+      const extension = file.split(';')[0].split('/')[1];
+      const type = file.split(';')[0].split('/')[0];
+      const vtHead = file.indexOf(',');
+      var data = file.slice(vtHead+1, file.length);
+      const fileName = uuidv4() + '.' + extension;
+      fs.writeFile('./public/room/' + roomId + '/' + fileName, data, {encoding: 'base64'}, function(err) {
+        var mess = {
+          sender: message.sender,
+          time: message.time,
+          type: type,
+          content: 'room/' + roomId + '/'+ fileName
+        }
+        console.log(mess);
+        messModel.saveMess(roomId, mess);
+         messModel.saveMess(roomId, message);
+     io.to(roomId).emit('ib_mess', mess);
      io.to(roomId).emit('ib_mess', message);
 
+      });
+  }
+  else
+  {
+     messModel.saveMess(roomId, message);
+     // console.log('ko co file')
+    io.to(roomId).emit('ib_mess', message);
+  }
   });
 })}

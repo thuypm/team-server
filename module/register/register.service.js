@@ -30,7 +30,7 @@ exports.Resister = async(data)=>{
         //           }
     
         //         });
-           fs.copyFile('./public/users/unknown.jpg', './public/users/' + newUser.username + '.jpg' , (err)=>{
+        fs.copyFile('./public/user/unknown.jpg', './public/user/' + newUser.username + '.jpg' , (err)=>{
               if(err)
                   throw err;
               }); 

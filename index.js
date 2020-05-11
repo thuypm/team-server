@@ -17,13 +17,13 @@ app.use(cors({credentials: true, origin: 'http://localhost:8080'}));
 
 mongoose.connect(process.env.DATABASE,{
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 })
         .then(()=>console.log(`Connect db successfully !`))
         .catch((err) => console.log(`Connect db failed `, err));
 
 
-app.use(bodyParser());
+app.use(bodyParser({limit: '50mb'}));
 
 app.use(express.static("public"));
 app.use('/signup', register);
