@@ -21,10 +21,10 @@ const Room = new Schema({
         default: Date.now()
     },
 
-   avatar: {
+    avatar: {
         type: String,
-       default: "0"
-   }
+        default: "0"
+    }
 
 });
 

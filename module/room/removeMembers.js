@@ -25,7 +25,7 @@ async function RemoveMembers(req, res) {
         res.send(room);
     }
     else {
-        res.send("false");
+        res.send(false);
     }
 
 

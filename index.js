@@ -13,7 +13,7 @@ const { ExpressPeerServer } = require('peer');
 require('dotenv/config');
 
 
-app.use(cors({credentials: true, origin: 'http://localhost:8080'}));
+app.use(cors({credentials: true, origin: '*'}));
 
 mongoose.connect(process.env.DATABASE,{
     useNewUrlParser: true,

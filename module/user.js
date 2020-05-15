@@ -6,58 +6,58 @@ const auth = require('../middleware/verifyToken');
 const multer = require('multer');
 var fs = require('fs');
 const storage = multer.diskStorage({
-    destination:function(req, file, cb){
+    destination: function (req, file, cb) {
         cb(null, './public/upload/');
     },
-    filename:function(req, file, cb){
+    filename: function (req, file, cb) {
         cb(null, 'tmp' + '.jpg');
     }
 });
 
-const fileFilter = (req, file, cb)=>{
-    if(file.mimetype === 'image/jpg' || file.mimetype === 'image/png'
-        || file.mimetype === 'image/jpeg'){
-            cb(null, true);
-        }else{
-            cb(null, false);
-        }
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/jpg' || file.mimetype === 'image/png'
+        || file.mimetype === 'image/jpeg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
 }
 
 const upload = multer({
     storage: storage,
-    limits:{
+    limits: {
         fileSize: 1024 * 1024 * 5
     },
     fileFilter: fileFilter
 });
 
-router.post('/search', auth,async(req,res)=>{
+router.post('/search', auth, async (req, res) => {
     const name = req.body.username;
 
-    const search = await User.find({username : new RegExp(name)}, {'_id':0, 'username':1});
+    const search = await User.find({ username: new RegExp(name) }, { '_id': 0, 'username': 1 });
     res.status(200).json(search);
 })
 
-router.post('/getAllMeeting', auth, async(req, res)=>{
- 
-    
-    const room = await Room.find({$or: [{members : req.body.username}]})
-                            .select('_id name avatar members owner timeCreate');
+router.post('/getAllMeeting', auth, async (req, res) => {
 
-    const rooms ={
+
+    const room = await Room.find({ $or: [{ members: req.body.username }] })
+        .select('_id name avatar members owner timeCreate');
+
+    const rooms = {
         message: 'get room successfully',
         content: room
     }
     res.status(200).json(rooms);
 })
 
-router.post('/avatar', upload.single('avatar'), auth, async(req,res)=>{
-    var tmpFile = './public/upload/'+ req.file.filename;
-    fs. rename(tmpFile, './public/user/'+ req.body.username+'.jpg', ()=>{
-      return res.send('/public/user/'+ req.body.username+'.jpg');  
+router.post('/avatar', upload.single('avatar'), auth, async (req, res) => {
+    var tmpFile = './public/upload/' + req.file.filename;
+    fs.rename(tmpFile, './public/user/' + req.body.username + '.jpg', () => {
+        res.send(req.body.username + '.jpg');
     });
 
-    
+
 })
 
 
