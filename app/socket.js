@@ -30,28 +30,29 @@ module.exports = function (io) {
         }
       })
     })
-    socket.on('loadMess', (roomID, page) => {
-      Room.findById(roomID, { message: { $slice: [-(page) * 5, 6] } }, (err, data) => {
-        if (err || data == null) {
-          console.log("room not exits");
-          io.sockets.in(roomID).emit("room-not-found", roomID);
-        } else {
-          // console.log(data.message);
-          socket.emit('loadMess', data.message);
-        }
 
-      })
+socket.on('loadMess', async (roomID, page) => {
+    
+      var room = await Room.findById(roomID).select('message');
+      var mess = room.message;
+      var len = mess.length;
+
+      if(page*15+15 > len)
+        if(page*15 < len )
+      {
+        var res = mess.slice(0,len-page*15);
+        socket.emit('loadMess', res);
+      }
+      else
+        socket.emit('loadMess', []);
+      else
+      {
+        var res= mess.slice(-page*15-15, 15);
+         socket.emit('loadMess', res);
+              }
+      // console.log(mess);
+
     })
-
-    // socket.on('loadMess', (roomID) => {
-    //   Room.findById(roomID, (err, data) => {
-    //     if (err) {
-    //       console.log("room not exits");
-    //       io.sockets.in(roomID).emit("room not exits", roomID);
-    //     } else
-    //       socket.emit('loadMess', data.message);
-    //   })
-    // })
 
     socket.on('screen', (roomId, video) => { // share màn hình
       io.to(roomId).emit('screen', socket.id, video);
@@ -84,6 +85,7 @@ module.exports = function (io) {
 
 
     socket.on('send_mess', function (roomId, file, message) {
+      // console.log(message);
       Room.findById(roomId, (err, data) => {
         if (err) socket.emit("room-not-found");
         else {
