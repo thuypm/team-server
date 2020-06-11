@@ -2,20 +2,21 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/user');
 const Room = require('../../models/room');
-
+var mongoose = require('mongoose');
 async function AddMembers(req, res) {
 
 
 // thiếu kiểm tra xem có tồn tại room hay ko ?
 
- var  newRoom = await Room.findById(req.body.roomId, (err, data)=>{ ///đoaạn này khó hiểu
-if(err)
-    {
-         res.send(false);
-         return;
+ var  newRoom ;
+ if(!mongoose.Types.ObjectId.isValid(req.body.roomId))
+       {
+        res.send(false);
+        return;
+       } 
+    else{
+      newRoom = await Room.findById(req.body.roomId);
     }
-
- });
 
 
     await Room.updateOne({_id: req.body.roomId}, {
