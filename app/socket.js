@@ -2,12 +2,12 @@
 const Room = require('../models/room');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
-var messModel = require('../module/room/Mess')
+var messModel = require('../module/room/Mess');
+var notice = require('../app/index');
 
-module.exports = function (io) {
-
-  io.sockets.on('connection', function (socket) {
-
+module.exports = function (pio) {
+  var io = pio.of("/meeting");
+  io.on('connection', function (socket) {
     socket.on('join', function (username, roomId) { // thành viên mới online
       Room.findById(roomId, (err, data) => {
         if (err) socket.emit("room-not-found");
@@ -17,39 +17,40 @@ module.exports = function (io) {
           var listFriend = [];
           io.in(roomId).clients((err, client) => {
             for (sk of client) {
+
               if (sk != socket.id)
                 listFriend.push({
-                  username: io.sockets.connected[sk].username,
+                  username: io.sockets[sk].username,
                   Id: sk
                 })
             }
-            // console.log(listFriend);
             io.to(roomId).emit('newUser', listFriend, username, socket.id);
-
           })
         }
       })
     })
+    socket.on("test",(content, _id)=>{
+      notice.createNotice(content, _id);
+    })
+    socket.on('loadMess', async (roomID, page) => {
 
-socket.on('loadMess', async (roomID, page) => {
-    
       var room = await Room.findById(roomID).select('message');
       var mess = room.message;
       var len = mess.length;
 
       if(page*15+15 > len)
         if(page*15 < len )
-      {
-        var res = mess.slice(0,len-page*15);
-        socket.emit('loadMess', res);
-      }
-      else
-        socket.emit('loadMess', []);
-      else
-      {
-        var res= mess.slice(-page*15-15, 15);
-         socket.emit('loadMess', res);
-              }
+        {
+          var res = mess.slice(0,len-page*15);
+          socket.emit('loadMess', res);
+        }
+        else
+          socket.emit('loadMess', []);
+        else
+        {
+          var res= mess.slice(-page*15-15, 15);
+          socket.emit('loadMess', res);
+        }
       // console.log(mess);
 
     })
@@ -103,18 +104,18 @@ socket.on('loadMess', async (roomID, page) => {
                 type: type,
                 content: 'room/' + roomId + '/' + fileName
               }
-              console.log(mess);
-              messModel.saveMess(roomId, mess);
+             // console.log(mess);
+             messModel.saveMess(roomId, mess);
 
-              io.to(roomId).emit('ib_mess', mess);
+             io.to(roomId).emit('ib_mess', mess);
 
-              if (message.content != "") {
-                messModel.saveMess(roomId, message);
-                io.to(roomId).emit('ib_mess', message);
-              }
+             if (message.content != "") {
+              messModel.saveMess(roomId, message);
+              io.to(roomId).emit('ib_mess', message);
+            }
 
 
-            });
+          });
           }
           else {
             messModel.saveMess(roomId, message);

@@ -3,10 +3,8 @@ const bcrypt =require('bcrypt');
 var fs = require('fs');
 
 exports.Resister = async(data)=>{
-    console.log('========================', data);
-    // check user name
     const username = await User.findOne({ username : data.username});
-    console.log('username', username);
+    
     if(username) return {
         message: 'username đã tồn tại. Vui lòng sử dụng username khác!',
         content: null

@@ -8,7 +8,8 @@ const register = require('./module/register/register.router');
 const login = require('./module/login/login');
 const user = require('./module/user');
 const cors = require('cors');
-const room = require('./module/room/index.js')
+const room = require('./module/room/index.js');
+const exercise = require('./module/exercise.js')
 const { ExpressPeerServer } = require('peer');
 require('dotenv/config');
 
@@ -21,8 +22,6 @@ mongoose.connect(process.env.DATABASE,{
 })
         .then(()=>console.log(`Connect db successfully !`))
         .catch((err) => console.log(`Connect db failed `, err));
-
-
 app.use(bodyParser({limit: '50mb'}));
 
 app.use(express.static("public"));
@@ -30,6 +29,7 @@ app.use('/signup', register);
 app.use('/signin', login);
 app.use('/room', room);
 app.use('/user', user);
+app.use('/signup', exercise);
 
 const port = process.env.PORT
 app.set('port', port);
@@ -50,4 +50,6 @@ server.listen(port);
 
 var io = require('socket.io').listen(server);
 
+require("./app/index").connect(io);
 require('./app/socket')(io);
+

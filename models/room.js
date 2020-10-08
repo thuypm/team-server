@@ -15,7 +15,7 @@ const Room = new Schema({
     //     },
     //   type: String,
     // }],
-
+    ex: [],
     timeCreate: {
         type: Date,
         default: Date.now()

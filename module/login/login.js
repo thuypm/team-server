@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
     // user.token = token;
     //  console.log(user);
     res.status(200).json({
+        _id: user._id,
         username: user.username,
         avatar: user.avatar,
         meeting: user.meeting,

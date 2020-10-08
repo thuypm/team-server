@@ -31,25 +31,21 @@ const upload = multer({
     fileFilter: fileFilter
 });
 
-router.post('/search', auth, async (req, res) => {
-    const name = req.body.username;
-
-    const search = await User.find({ username: new RegExp(name) }, { '_id': 0, 'username': 1 });
+router.post('/getEx', auth, async (req, res) => {
+    var room = req.body.room;
+    var search = await Exercise.find({ _id: room.id });
     res.status(200).json(search);
 })
-router.post('/getUser', auth, async (req, res) => {
-    const name = req.body.username;
-    const search = await User.findOne({ username: req.body.username },{ '_id': 0, 'password': 0 });
-    res.status(200).json(search);
-})
-router.post('/getAllMeeting', auth, async (req, res) => {
-    const room = await Room.find({ $or: [{ members: req.body.username }] })
-        .select('_id name avatar members owner timeCreate');
 
-    const rooms = {
-        message: 'get room successfully',
-        content: room
-    }
+router.post('/addEx', auth, async (req, res) => {
+    var data = req.body.data
+    // const data = await Exercise.find({ $or: [{ members: req.body.username }] })
+    //     .select('_id name avatar members owner timeCreate');
+
+    // const rooms = {
+    //     message: 'get room successfully',
+    //     content: room
+    // }
     res.status(200).json(rooms);
 })
 
@@ -58,8 +54,6 @@ router.post('/avatar', upload.single('avatar'), auth, async (req, res) => {
     fs.rename(tmpFile, './public/user/' + req.body.username + '.jpg', () => {
         res.send(req.body.username + '.jpg');
     });
-
-
 })
 
 
